@@ -4,7 +4,6 @@ from word_list import word_list as words
 import random
 import time
 import datetime
-import threading
 
 YELLOW = "#FFECAF"
 ORANGE = "#FFB07F"
@@ -19,7 +18,7 @@ class TypingSpeed_GUI:
 
         self.errors = 0
         self.right_words = []
-        number_of_words = 100
+        number_of_words = 50
         self.words = random.sample(words, number_of_words)  # Add your word list
 
         self.create_widgets()
@@ -34,15 +33,14 @@ class TypingSpeed_GUI:
         self.time_canvas = self.canvas.create_text(250, 80, text="Time left: 60", fill=PINK, font=("Arial", 10, "bold"))
         self.error_canvas = self.canvas.create_text(50, 80, text=f"Errors: {self.errors}", fill=PINK, font=("Arial", 10, "bold"))
         self.wpm_canvas= self.canvas.create_text(500, 80, text=f"WPM: {len(self.right_words)}", fill=PINK, font=("Arial", 10, "bold"))
-        #self.restart_button_canvas = self.canvas.create_button(900, 80, text="Restart", fill=PINK, font=("Arial", 10, "bold"))
-        self.canvas.grid(row=0, column=0, pady=5)
 
+        self.canvas.grid(row=0, column=0, pady=5)
 
         self.restart_button = Button(self.master, text="Restart", font=("Arial", 10), fg=PINK, bg=YELLOW, pady=5, command=self.restart)
         self.restart_button.grid(row=0, column=1, pady=5)
 
-        self.words_box = Label(self.master, width=70, height=8, font=("Arial", 15), fg=PURPLE, justify="left", wraplength=700)
-        self.words_box.config(text=", ".join(self.words))
+        self.words_box = Text(self.master, width=70, height=8, font=("Arial", 12), fg=PURPLE, wrap="word", state="disabled")
+        self.words_box
         self.words_box.grid(row=1, column=0, columnspan=3, pady=5)
 
         self.typing_entry = Text(self.master, width=60, font=("Arial", 20), fg=PURPLE)
@@ -64,7 +62,6 @@ class TypingSpeed_GUI:
     def countdown(self, seconds):
         '''Counts down from the given seconds'''
         self.canvas.itemconfig(self.time_canvas, text=f"Time left: {self.countdown_seconds}")
-
         if self.countdown_seconds > 0 and not self.stop_countdown:
             self.master.after(1000, self.countdown, self.countdown_seconds)
             self.countdown_seconds -= 1
