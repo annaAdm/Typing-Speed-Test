@@ -27,7 +27,6 @@ class TypingSpeed_GUI:
         self.countdown_seconds = 60
         self.countdown_running = False
         self.stop_countdown = False
-        self.space_pressed = False
 
     def create_widgets(self):
         self.title_label = Label(self.master, text="Typing Speed Test", font=("Courier", 30, "bold"), fg=PURPLE, bg=PINK, padx=10, pady=10)
@@ -79,22 +78,17 @@ class TypingSpeed_GUI:
             self.countdown_running = True
             self.stop_countdown = False
             self.start_countdown()
-        # char_typed = event.char.lower()
-        # self.char_typed += char_typed
-        self.space_pressed = False
-        self.end_of_word = False
-
 
     def space_press(self, event):
         print("Space pressed")
         # Get the current word typed
         current_typing = self.typing_entry.get("1.0", "end-1c").strip().lower().split()
-        # Get the new word typed from the first to the last
-        self.typed_word = current_typing[len(self.typed_words_list):]
-        self.typed_words_list.extend(self.typed_word)
-
+        # Get the new word typed from the first char,to the last char before the space (the space is not included)
+        # all the word is lowercase, without spaces, the space is the delimiter between words
+        # Get the last word typed, from the length of the list of words typed.
+        self.typed_word = current_typing[len(self.typed_words_list):]  # from the item[len(list)] to the end
+        self.typed_words_list.extend(self.typed_word)  # Add the new word to the list of words typed
         print("Typed words:", self.typed_words_list)
         print("Word:", self.typed_word)
-        self.space_pressed = True
-
+        # print("Words:", self.words)
 
