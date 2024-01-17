@@ -17,11 +17,12 @@ class TypingSpeed_GUI:
         master.config(bg=YELLOW, padx=25, pady=25)
 
         self.errors = 0
+        self.i = 0
         self.right_words = []
         self.typed_words_list = []
         self.typed_word = ""
-        number_of_words = 300
-        self.words = random.sample(words, number_of_words)  # Add your word list
+        self.number_of_words = 300
+        self.words = random.sample(words, self.number_of_words)  # Add your word list
 
         self.create_widgets()
         self.countdown_seconds = 60
@@ -65,6 +66,18 @@ class TypingSpeed_GUI:
         self.right_words = []
         self.countdown_seconds = 60
         # self.typing_entry.delete("1.0", "end") #
+        self.words = random.sample(words, self.number_of_words)
+        self.words_box.config(state="normal")
+        self.words_box.delete("1.0", "end")
+        for word in self.words:
+            self.words_box.insert("end", word + ", ")
+        self.words_box.config(state="disabled")
+        self.i = 0
+        self.typed_words_list = []
+        self.typed_word = ""
+        self.canvas.itemconfig(self.error_canvas, text=f"Errors: {self.errors}")
+        self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {len(self.right_words)}")
+        self.canvas.itemconfig(self.time_canvas, text=f"Time left: {self.countdown_seconds}")
 
         self.typing_entry.config(fg=PINK)
         self.typing_entry.insert("end", "Start typing here...", )  # Add the text "Start typing here..."
@@ -111,16 +124,20 @@ class TypingSpeed_GUI:
         # print("Words:", self.words)
 
     def check_word(self):
-        i = 0
-        if self.words[i] == self.typed_words_list[i]:
+        if self.words[self.i] == self.typed_words_list[self.i]:
             self.right_words.append(self.typed_word)
             print("Right words:", len(self.right_words))
 
         else:
             self.errors += 1
+            #print("Errors:", self.errors)
+            self.canvas.itemconfig(self.error_canvas, text=f"Errors: {self.errors}")
+        print(self.words[self.i], self.typed_words_list[self.i])
+        self.i += 1
 
-            print("Errors:", self.errors)
-        print(self.words[i], self.typed_words_list[i])
-        i += 1
+    def wpm(self):
+        self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {len(self.right_words)*60}")
+
+        return len(self.right_words)
 
 
