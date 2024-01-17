@@ -36,7 +36,7 @@ class TypingSpeed_GUI:
         #self.title_canvas = self.canvas.create_text(500, 20, text="Typing Speed Test", fill=PURPLE, font=("Arial", 30, "bold"))
         self.time_canvas = self.canvas.create_text(250, 55, text="Time left: 60", fill=PINK, font=("Arial", 10, "bold"))
         self.error_canvas = self.canvas.create_text(50, 55, text=f"Errors: {self.errors}", fill=PINK, font=("Arial", 10, "bold"))
-        self.wpm_canvas= self.canvas.create_text(500, 55, text=f"WPM: {len(self.right_words)}", fill=PINK, font=("Arial", 10, "bold"))
+        self.wpm_canvas= self.canvas.create_text(500, 55, text=f"WPM: {len(self.right_words)*60}", fill=PINK, font=("Arial", 10, "bold"))
 
         self.canvas.grid(row=1, column=0, pady=5)
 
@@ -127,6 +127,7 @@ class TypingSpeed_GUI:
         if self.words[self.i] == self.typed_words_list[self.i]:
             self.right_words.append(self.typed_word)
             print("Right words:", len(self.right_words))
+            self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {len(self.right_words)*60/60}")
 
         else:
             self.errors += 1
@@ -135,9 +136,6 @@ class TypingSpeed_GUI:
         print(self.words[self.i], self.typed_words_list[self.i])
         self.i += 1
 
-    def wpm(self):
-        self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {len(self.right_words)*60}")
 
-        return len(self.right_words)
 
 
