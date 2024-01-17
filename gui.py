@@ -5,15 +5,16 @@ import random
 import time
 import datetime
 
-YELLOW = "#FFECAF"
-ORANGE = "#FFB07F"
+GREY = "#F0F0F0"
+ORANGE = "#FF6347"
 PINK = "#FF52A2"
+TURQUOISE = "#b0f4f0"
 PURPLE = "#5F0F40"
 class TypingSpeed_GUI:
     def __init__(self, master, *args, **kwargs):
         self.master = master
         master.title("Typing Speed Test")
-        master.config(bg=YELLOW, padx=25, pady=25)
+        master.config(bg=GREY, padx=25, pady=25)
 
         self.errors = 0
         self.i = 0
@@ -29,18 +30,19 @@ class TypingSpeed_GUI:
         self.stop_countdown = False
 
     def create_widgets(self):
-        self.title_label = Label(self.master, text="Typing Speed Test", font=("Courier", 30, "bold"), fg=PURPLE, bg=PINK, padx=10, pady=10)
-        self.title_label.grid(row=0, column=0)
-        self.canvas = Canvas(self.master, width=1000, height=90, bg=YELLOW, highlightthickness=0)
-        #self.title_canvas = self.canvas.create_text(500, 20, text="Typing Speed Test", fill=PURPLE, font=("Arial", 30, "bold"))
+        self.title_label = Label(self.master, text="Typing Speed Test", font=("Courier New", 30, "bold"), fg=GREY, bg=PINK, padx=10, pady=10)
+        self.title_label.grid(row=0, column=0, columnspan=2, pady=5)
+        self.canvas = Canvas(self.master, width=1000, height=90, bg=GREY, highlightthickness=0)
         self.time_canvas = self.canvas.create_text(250, 55, text="Time left: 60", fill=PINK, font=("Arial", 10, "bold"))
         self.error_canvas = self.canvas.create_text(50, 55, text=f"Errors: {self.errors}", fill=PINK, font=("Arial", 10, "bold"))
         self.wpm_canvas = self.canvas.create_text(500, 55, text=f"WPM: {""}", fill=PINK, font=("Arial", 10, "bold"))
         self.cpm_canvas = self.canvas.create_text(750, 55, text=f"Score: {""}", fill=PINK, font=("Arial", 10, "bold"))
+        self.best_score_label = Label(self.master, text="Best score: ", font=("Arial", 10, "bold"), fg=PURPLE, bg=TURQUOISE, padx=2, pady=2)
+        self.best_score_label.grid(row=0, column=1)
 
         self.canvas.grid(row=1, column=0, pady=5)
 
-        self.restart_button = Button(self.master, text="Restart", font=("Arial", 10, "bold"), fg=YELLOW, bg=PINK, pady=5, command=self.restart)
+        self.restart_button = Button(self.master, text="Restart", font=("Arial", 10, "bold"), fg=GREY, bg=PINK, pady=2, padx=2, command=self.restart, highlightthickness=0, bd=0)
         self.restart_button.grid(row=1, column=1, pady=5)
 
         self.words_box = Text(self.master, width=70, height=8, font=("Arial", 15), fg=PURPLE, wrap="word")
@@ -96,7 +98,7 @@ class TypingSpeed_GUI:
         self.countdown(60)
 
     def click_press(self, event):
-        if event:
+        if event and not self.countdown_running:
             self.typing_entry.delete("1.0", "end")  # Delete the text "Start typing here..."
             self.typing_entry.config(fg=PURPLE)
 
@@ -134,6 +136,13 @@ class TypingSpeed_GUI:
             # print("WPM:", wpm)
             self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {wpm}")
             self.canvas.itemconfig(self.cpm_canvas, text=f"Score: {cpm}")
+            self.words_box.config(state="normal")
+            # search the word in word_box and change the color to pink
+            if self.words[self.i] in self.words_box.get("1.0", "end-1c"):
+                self.words_box.tag_config("found", foreground=PINK)
+            # Disable the Text widget so that the user can't edit it
+            self.words_box.config(state="disabled")
+            self.words_box.grid(row=2, column=0, columnspan=2, pady=5)
 
         else:
             self.errors += 1
