@@ -11,5 +11,6 @@ if __name__ == "__main__":
     # root.bind('<space>', gui.space_press)
     # root.bind('<BackSpace>', gui.backspace_press)
     # root.bind('<Return>', gui.enter_press)
+    root.bind('<ButtonRelease>', gui.click_press)
     root.bind('<space>', gui.space_press)
     root.mainloop()

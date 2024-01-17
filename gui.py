@@ -10,7 +10,7 @@ ORANGE = "#FFB07F"
 PINK = "#FF52A2"
 PURPLE = "#5F0F40"
 class TypingSpeed_GUI:
-    def __init__(self, master):
+    def __init__(self, master, *args, **kwargs):
         self.master = master
         master.title("Typing Speed Test")
         #master.geometry("1000x600")
@@ -20,7 +20,7 @@ class TypingSpeed_GUI:
         self.right_words = []
         self.typed_words_list = []
         self.typed_word = ""
-        number_of_words = 50
+        number_of_words = 300
         self.words = random.sample(words, number_of_words)  # Add your word list
 
         self.create_widgets()
@@ -42,12 +42,19 @@ class TypingSpeed_GUI:
         self.restart_button = Button(self.master, text="Restart", font=("Arial", 10, "bold"), fg=YELLOW, bg=PINK, pady=5, command=self.restart)
         self.restart_button.grid(row=1, column=1, pady=5)
 
-        self.words_box = Text(self.master, width=70, height=8, font=("Arial", 12), fg=PURPLE, wrap="word", state="disabled")
-        self.words_box
+        self.words_box = Text(self.master, width=70, height=8, font=("Arial", 15), fg=PURPLE, wrap="word")
+        # Enable the Text widget so that we can insert content into it
+        self.words_box.config(state="normal")
+        for word in self.words:
+            self.words_box.insert("end", word + ", ")
+        # Disable the Text widget so that the user can't edit it
+        self.words_box.config(state="disabled")
         self.words_box.grid(row=2, column=0, columnspan=2, pady=5)
 
-        self.typing_entry = Text(self.master, width=60, height=8, font=("Arial", 15), fg=PURPLE)
-        self.typing_entry.grid(row=3, column=0, columnspan=2, pady=10)
+        self.typing_entry = Text(self.master, width=70, height=6, font=("Arial", 15), fg=PURPLE)
+        self.typing_entry.config(fg=PINK)
+        self.typing_entry.insert("end", "Start typing here...",)
+        self.typing_entry.grid(row=3, column=0, columnspan=2, pady=5)
 
     # ---------------------------- RESTART ------------------------------- #
     def restart(self):
@@ -57,7 +64,10 @@ class TypingSpeed_GUI:
         self.errors = 0
         self.right_words = []
         self.countdown_seconds = 60
-        self.typing_entry.delete("1.0", "end")
+        # self.typing_entry.delete("1.0", "end") #
+
+        self.typing_entry.config(fg=PINK)
+        self.typing_entry.insert("end", "Start typing here...", )  # Add the text "Start typing here..."
 
     # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
     def countdown(self, seconds):
@@ -72,6 +82,12 @@ class TypingSpeed_GUI:
         # Start countdown in a separate thread
         self.countdown(60)
 
+    def click_press(self, event):
+        if event:
+            self.typing_entry.delete("1.0", "end")  # Delete the text "Start typing here..."
+            self.typing_entry.config(fg=PURPLE)
+
+    # ---------------------------- KEY PRESS ------------------------------- #
     def key_press(self, event):
         if not self.countdown_running:
             # Start the countdown only if it's not already running
@@ -80,7 +96,7 @@ class TypingSpeed_GUI:
             self.start_countdown()
 
     def space_press(self, event):
-        print("Space pressed")
+        # print("Space pressed")
         # Get the current word typed
         current_typing = self.typing_entry.get("1.0", "end-1c").strip().lower().split()
         # Get the new word typed from the first char,to the last char before the space (the space is not included)
@@ -90,5 +106,21 @@ class TypingSpeed_GUI:
         self.typed_words_list.extend(self.typed_word)  # Add the new word to the list of words typed
         print("Typed words:", self.typed_words_list)
         print("Word:", self.typed_word)
+        self.check_word()
+
         # print("Words:", self.words)
+
+    def check_word(self):
+        i = 0
+        if self.words[i] == self.typed_words_list[i]:
+            self.right_words.append(self.typed_word)
+            print("Right words:", len(self.right_words))
+
+        else:
+            self.errors += 1
+
+            print("Errors:", self.errors)
+        print(self.words[i], self.typed_words_list[i])
+        i += 1
+
 
