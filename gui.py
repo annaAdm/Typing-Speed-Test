@@ -13,7 +13,6 @@ class TypingSpeed_GUI:
     def __init__(self, master, *args, **kwargs):
         self.master = master
         master.title("Typing Speed Test")
-        #master.geometry("1000x600")
         master.config(bg=YELLOW, padx=25, pady=25)
 
         self.errors = 0
@@ -36,7 +35,8 @@ class TypingSpeed_GUI:
         #self.title_canvas = self.canvas.create_text(500, 20, text="Typing Speed Test", fill=PURPLE, font=("Arial", 30, "bold"))
         self.time_canvas = self.canvas.create_text(250, 55, text="Time left: 60", fill=PINK, font=("Arial", 10, "bold"))
         self.error_canvas = self.canvas.create_text(50, 55, text=f"Errors: {self.errors}", fill=PINK, font=("Arial", 10, "bold"))
-        self.wpm_canvas= self.canvas.create_text(500, 55, text=f"WPM: {len(self.right_words)*60}", fill=PINK, font=("Arial", 10, "bold"))
+        self.wpm_canvas = self.canvas.create_text(500, 55, text=f"WPM: {""}", fill=PINK, font=("Arial", 10, "bold"))
+        self.cpm_canvas = self.canvas.create_text(750, 55, text=f"Score: {""}", fill=PINK, font=("Arial", 10, "bold"))
 
         self.canvas.grid(row=1, column=0, pady=5)
 
@@ -108,6 +108,7 @@ class TypingSpeed_GUI:
             self.stop_countdown = False
             self.start_countdown()
 
+    # ---------------------------- SPACE PRESS ------------------------------- #
     def space_press(self, event):
         # print("Space pressed")
         # Get the current word typed
@@ -117,17 +118,22 @@ class TypingSpeed_GUI:
         # Get the last word typed, from the length of the list of words typed.
         self.typed_word = current_typing[len(self.typed_words_list):]  # from the item[len(list)] to the end
         self.typed_words_list.extend(self.typed_word)  # Add the new word to the list of words typed
-        print("Typed words:", self.typed_words_list)
-        print("Word:", self.typed_word)
+        # print("Typed words:", self.typed_words_list)
+        # print("Word:", self.typed_word)
         self.check_word()
-
         # print("Words:", self.words)
 
+    # ---------------------------- CHECK WORD ------------------------------- #
     def check_word(self):
         if self.words[self.i] == self.typed_words_list[self.i]:
             self.right_words.append(self.typed_word)
             print("Right words:", len(self.right_words))
-            self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {len(self.right_words)*60/60}")
+            cpm = len(self.typing_entry.get("1.0", "end-1c"))
+            # print("Length of typed word:", cpm)
+            wpm = (cpm/5)/1
+            # print("WPM:", wpm)
+            self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {wpm}")
+            self.canvas.itemconfig(self.cpm_canvas, text=f"Score: {cpm}")
 
         else:
             self.errors += 1
