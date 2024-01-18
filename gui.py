@@ -1,4 +1,3 @@
-import tkinter as tk
 from tkinter import Label, Canvas, Button, Text
 from word_list import word_list as words
 import random
@@ -7,6 +6,8 @@ GREY = "#F0F0F0"
 PINK = "#FF52A2"
 L_BLUE = "#38F6FC"
 PURPLE = "#5F0F40"
+
+
 class TypingSpeed_GUI:
     def __init__(self, master, *args, **kwargs):
         self.master = master
