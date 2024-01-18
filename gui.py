@@ -17,7 +17,13 @@ class TypingSpeed_GUI:
         master.config(bg=GREY, padx=25, pady=25)
 
         self.errors = 0
+        self.cpm = 0
+        self.wpm = 0
         self.i = 0
+        with open("data.txt", mode="w") as file:
+            file.write("0")
+        with open("data.txt") as file:
+            self.high_score = int(file.read())
         self.right_words = []
         self.typed_words_list = []
         self.typed_word = ""
@@ -25,7 +31,7 @@ class TypingSpeed_GUI:
         self.words = random.sample(words, self.number_of_words)  # Add your word list
 
         self.create_widgets()
-        self.countdown_seconds = 60
+        self.countdown_seconds = 10
         self.countdown_running = False
         self.stop_countdown = False
 
@@ -37,8 +43,11 @@ class TypingSpeed_GUI:
         self.error_canvas = self.canvas.create_text(50, 55, text=f"Errors: {self.errors}", fill=PINK, font=("Arial", 10, "bold"))
         self.wpm_canvas = self.canvas.create_text(500, 55, text=f"WPM: {""}", fill=PINK, font=("Arial", 10, "bold"))
         self.cpm_canvas = self.canvas.create_text(750, 55, text=f"Score: {""}", fill=PINK, font=("Arial", 10, "bold"))
-        self.best_score_label = Label(self.master, text="Best score: ", font=("Arial", 10, "bold"), fg=PURPLE, bg=TURQUOISE, padx=2, pady=2)
-        self.best_score_label.grid(row=0, column=1)
+        self.highscore_label = Label(self.master, text=f"Best score: {self.high_score} ", font=("Arial", 10, "bold"), fg=PURPLE, bg=TURQUOISE, padx=2, pady=2)
+        self.highscore_label.grid(row=0, column=1)
+
+        self.end_game_canvas = Canvas(self.master, width=0, height=0, bg=TURQUOISE, highlightthickness=0)
+        self.end_game_canvas.grid(row=1, column=0, pady=5)
 
         self.canvas.grid(row=1, column=0, pady=5)
 
@@ -78,19 +87,55 @@ class TypingSpeed_GUI:
         self.typed_words_list = []
         self.typed_word = ""
         self.canvas.itemconfig(self.error_canvas, text=f"Errors: {self.errors}")
-        self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {len(self.right_words)}")
+        self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {""}")
         self.canvas.itemconfig(self.time_canvas, text=f"Time left: {self.countdown_seconds}")
+        self.cpm = 0
+        self.wpm = 0
 
         self.typing_entry.config(fg=PINK)
+        self.typing_entry.config(state="normal")
+        self.typing_entry.delete("1.0", "end")  # Delete all the previous text"
         self.typing_entry.insert("end", "Start typing here...", )  # Add the text "Start typing here..."
+        if hasattr(self, "end_game_canvas"):
+            for widget in self.end_game_canvas.winfo_children():
+                widget.destroy()
+            self.end_game_canvas.grid_forget()
+
+
 
     # ---------------------------- COUNTDOWN MECHANISM ------------------------------- #
     def countdown(self, seconds):
         """Counts down from the given seconds"""
         self.canvas.itemconfig(self.time_canvas, text=f"Time left: {self.countdown_seconds}")
-        if self.countdown_seconds > 0 and not self.stop_countdown:
+        if self.countdown_seconds >= 0 and not self.stop_countdown:
             self.master.after(1000, self.countdown, self.countdown_seconds)
             self.countdown_seconds -= 1
+        if self.countdown_seconds == 0:
+            self.master.after(1000, self.countdown, self.countdown_seconds)
+            self.countdown_running = False
+            self.stop_countdown = True
+            if self.stop_countdown:
+                self.typing_entry.config(state="disabled")
+                self.check_highscore()
+                self.timesup()
+
+    def timesup(self):
+        self.end_game_canvas.grid(row=1,column=0,pady=5)
+        Label(self.end_game_canvas, text="TIME's UP!", font=("Arial", 15, "bold"), fg=PURPLE, bg=TURQUOISE,padx=2, pady=2).grid(row=1, column=0, pady=5)
+        Label(self.end_game_canvas,text=f"Your score: {self.cpm}\nYou can type {self.wpm} words per minute!\nYou did {self.errors} typing errors.",
+                        font=("Arial", 15, "bold"), fg=PURPLE, bg=TURQUOISE, padx=10, pady=10).grid(row=3,column=0,pady=5)
+        self.canvas.itemconfig(self.time_canvas, text=f"Time left: 0")
+
+
+    def check_highscore(self):
+        """ Checks if the current score is higher than the high score and updates the high score """
+        if self.cpm > self.high_score:
+            self.high_score = self.cpm
+            with open("data.txt", mode="w") as file:
+                file.write(str(self.high_score))
+        self.highscore_label.config(text=f"Best score: {self.high_score} ")
+
+
 
     # ---------------------------- START COUNTDOWN ------------------------------- #
     def start_countdown(self):
@@ -130,19 +175,22 @@ class TypingSpeed_GUI:
         if self.words[self.i] == self.typed_words_list[self.i]:
             self.right_words.append(self.typed_word)
             print("Right words:", len(self.right_words))
-            cpm = len(self.typing_entry.get("1.0", "end-1c"))
+            self.cpm = len(self.typing_entry.get("1.0", "end-1c"))
             # print("Length of typed word:", cpm)
-            wpm = (cpm/5)/1
+            
+            self.wpm = (self.cpm/5)/1
             # print("WPM:", wpm)
-            self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {wpm}")
-            self.canvas.itemconfig(self.cpm_canvas, text=f"Score: {cpm}")
+            self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {self.wpm}")
+            self.canvas.itemconfig(self.cpm_canvas, text=f"Score: {self.cpm}")
+
+            #GUARDA DA QUI!!!
             self.words_box.config(state="normal")
             # search the word in word_box and change the color to pink
             if self.words[self.i] in self.words_box.get("1.0", "end-1c"):
                 self.words_box.tag_config("found", foreground=PINK)
             # Disable the Text widget so that the user can't edit it
             self.words_box.config(state="disabled")
-            self.words_box.grid(row=2, column=0, columnspan=2, pady=5)
+            #self.words_box.grid(row=2, column=0, columnspan=2, pady=5)
 
         else:
             self.errors += 1
@@ -150,7 +198,3 @@ class TypingSpeed_GUI:
             self.canvas.itemconfig(self.error_canvas, text=f"Errors: {self.errors}")
         print(self.words[self.i], self.typed_words_list[self.i])
         self.i += 1
-
-
-
-
