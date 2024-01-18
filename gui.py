@@ -2,12 +2,10 @@ import tkinter as tk
 from tkinter import Label, Canvas, Button, Text
 from word_list import word_list as words
 import random
-import time
-import datetime
 
 GREY = "#F0F0F0"
 PINK = "#FF52A2"
-TURQUOISE = "#b0f4f0"
+L_BLUE = "#38F6FC"
 PURPLE = "#5F0F40"
 class TypingSpeed_GUI:
     def __init__(self, master, *args, **kwargs):
@@ -34,8 +32,6 @@ class TypingSpeed_GUI:
         self.countdown_running = False
         self.stop_countdown = False
 
-        self.words_box_index = "1.0"
-
     def create_widgets(self):
         self.title_label = Label(self.master, text="Typing Speed Test", font=("Courier New", 30, "bold"), fg=GREY, bg=PINK, padx=10, pady=10)
         self.title_label.grid(row=0, column=0, columnspan=2, pady=5)
@@ -44,10 +40,10 @@ class TypingSpeed_GUI:
         self.error_canvas = self.canvas.create_text(50, 55, text=f"Errors: {self.errors}", fill=PINK, font=("Arial", 10, "bold"))
         self.wpm_canvas = self.canvas.create_text(500, 55, text=f"WPM: {""}", fill=PINK, font=("Arial", 10, "bold"))
         self.cpm_canvas = self.canvas.create_text(750, 55, text=f"Score: {""}", fill=PINK, font=("Arial", 10, "bold"))
-        self.highscore_label = Label(self.master, text=f"Best score: {self.high_score} ", font=("Arial", 10, "bold"), fg=PURPLE, bg=TURQUOISE, padx=2, pady=2)
+        self.highscore_label = Label(self.master, text=f"Best score: {self.high_score} ", font=("Arial", 10, "bold"), fg=PURPLE, bg=L_BLUE, padx=2, pady=2)
         self.highscore_label.grid(row=0, column=1)
 
-        self.end_game_canvas = Canvas(self.master, width=0, height=0, bg=TURQUOISE, highlightthickness=0)
+        self.end_game_canvas = Canvas(self.master, width=0, height=0, bg=L_BLUE, highlightthickness=0)
         self.end_game_canvas.grid(row=1, column=0, pady=5)
 
         self.canvas.grid(row=1, column=0, pady=5)
@@ -122,9 +118,9 @@ class TypingSpeed_GUI:
     # ---------------------------- TIME'S UP ------------------------------- #
     def timesup(self):
         self.end_game_canvas.grid(row=1,column=0,pady=5)
-        Label(self.end_game_canvas, text="TIME's UP!", font=("Arial", 15, "bold"), fg=PURPLE, bg=TURQUOISE,padx=2, pady=2).grid(row=2, column=0, pady=5)
-        Label(self.end_game_canvas,text=f"Your score: {self.cpm}\nYou can type {self.wpm} words per minute!\nYou did {self.errors} typing errors.",
-                        font=("Arial", 15, "bold"), fg=PURPLE, bg=TURQUOISE, padx=10, pady=10).grid(row=3,column=0,pady=5)
+        Label(self.end_game_canvas, text="TIME's UP!", font=("Arial", 15, "bold"), fg=PURPLE, bg=L_BLUE, padx=2, pady=2).grid(row=2, column=0, pady=5)
+        Label(self.end_game_canvas, text=f"Your score: {self.cpm}\nYou can type {self.wpm} words per minute!\nYou did {self.errors} typing errors.",
+              font=("Arial", 15, "bold"), fg=PURPLE, bg=L_BLUE, padx=10, pady=10).grid(row=3, column=0, pady=5)
 
     # ---------------------------- CHECK HIGHSCORE ------------------------------- #
     def check_highscore(self):
@@ -174,19 +170,29 @@ class TypingSpeed_GUI:
 
     # ---------------------------- CHECK WORD ------------------------------- #
     def check_word(self):
-
         typed_words = self.typing_entry.get("1.0", "end-1c").strip().lower()
         self.typed_word = self.typing_entry.get("1.0", "end-1c").strip().lower().split()
+
+        start_index = self.words_box.search(self.words[self.i], '1.0', stopindex="end")
+        end_index = f"{start_index}+{len(self.words[self.i])}c"
+
         try:
             if self.words[self.i] == self.typed_words_list[self.i]:
                 self.right_words.append(self.typed_word)
                 print("Right words:", len(self.right_words))
+                # underline the right word in words_box in turquoise
+                # For correct words
+                self.words_box.tag_add("correct", start_index, end_index)
+                self.words_box.tag_config("correct", underline=1, foreground=L_BLUE)
 
             else:
                 self.errors += 1
                 print("Typed word:", typed_words, "Right word was:", self.words[self.i])
                 self.canvas.itemconfig(self.error_canvas, text=f"Errors: {self.errors}")
                 # print(self.words[self.i], self.typed_words_list[self.i], typed_words)
+                # underline the wrong word in words_box in pink
+                self.words_box.tag_add("wrong", start_index, end_index)
+                self.words_box.tag_config("wrong", underline=1, foreground=PINK)
 
             # move to the next word
             self.i += 1
