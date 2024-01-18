@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import Label, Canvas, Button, Text
 from word_list import word_list as words
 import random
-
+#TODO: round the WPM e CPM by 2
 GREY = "#F0F0F0"
 PINK = "#FF52A2"
 L_BLUE = "#38F6FC"
@@ -34,13 +34,13 @@ class TypingSpeed_GUI:
 
     def create_widgets(self):
         self.title_label = Label(self.master, text="Typing Speed Test", font=("Courier New", 30, "bold"), fg=GREY, bg=PINK, padx=10, pady=10)
-        self.title_label.grid(row=0, column=0, columnspan=2, pady=5)
-        self.canvas = Canvas(self.master, width=1000, height=90, bg=GREY, highlightthickness=0)
-        self.time_canvas = self.canvas.create_text(250, 55, text="Time left: 60", fill=PINK, font=("Arial", 10, "bold"))
-        self.error_canvas = self.canvas.create_text(50, 55, text=f"Errors: {self.errors}", fill=PINK, font=("Arial", 10, "bold"))
-        self.wpm_canvas = self.canvas.create_text(500, 55, text=f"WPM: {""}", fill=PINK, font=("Arial", 10, "bold"))
-        self.cpm_canvas = self.canvas.create_text(750, 55, text=f"Score: {""}", fill=PINK, font=("Arial", 10, "bold"))
-        self.highscore_label = Label(self.master, text=f"Best score: {self.high_score} ", font=("Arial", 10, "bold"), fg=PURPLE, bg=L_BLUE, padx=2, pady=2)
+        self.title_label.grid(row=0, column=0, columnspan=3, pady=5)
+        self.canvas = Canvas(self.master, width=1500, height=200, bg=GREY, highlightthickness=0)
+        self.time_canvas = self.canvas.create_text(250, 55, text="Time left: 60", fill=PINK, font=("Arial", 12, "bold"))
+        self.error_canvas = self.canvas.create_text(50, 55, text=f"Errors: {self.errors}", fill=PINK, font=("Arial", 12, "bold"))
+        self.wpm_canvas = self.canvas.create_text(500, 55, text=f"WPM: {""}", fill=PINK, font=("Arial", 12, "bold"))
+        self.cpm_canvas = self.canvas.create_text(750, 55, text=f"Score: {""}", fill=PINK, font=("Arial", 12, "bold"))
+        self.highscore_label = Label(self.master, text=f"Best score: {self.high_score} ", font=("Arial", 12, "bold"), fg=PURPLE, bg=L_BLUE, padx=2, pady=2)
         self.highscore_label.grid(row=0, column=1)
 
         self.end_game_canvas = Canvas(self.master, width=0, height=0, bg=L_BLUE, highlightthickness=0)
@@ -117,10 +117,10 @@ class TypingSpeed_GUI:
 
     # ---------------------------- TIME'S UP ------------------------------- #
     def timesup(self):
-        self.end_game_canvas.grid(row=1,column=0,pady=5)
-        Label(self.end_game_canvas, text="TIME's UP!", font=("Arial", 15, "bold"), fg=PURPLE, bg=L_BLUE, padx=2, pady=2).grid(row=2, column=0, pady=5)
+        self.end_game_canvas.grid(row=1,column=0,columnspan=3,pady=5)
+        Label(self.end_game_canvas, text="TIME's UP!", font=("Arial", 15, "bold"), fg=PURPLE, bg=L_BLUE, padx=2, pady=2).grid(row=2, column=0,columnspan=3, pady=5)
         Label(self.end_game_canvas, text=f"Your score: {self.cpm}\nYou can type {self.wpm} words per minute!\nYou did {self.errors} typing errors.",
-              font=("Arial", 15, "bold"), fg=PURPLE, bg=L_BLUE, padx=10, pady=10).grid(row=3, column=0, pady=5)
+              font=("Arial", 15, "bold"), fg=PURPLE, bg=L_BLUE, padx=10, pady=10).grid(row=3, column=0,columnspan=3, pady=5)
 
     # ---------------------------- CHECK HIGHSCORE ------------------------------- #
     def check_highscore(self):
@@ -208,6 +208,3 @@ class TypingSpeed_GUI:
         self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {self.wpm}")
         self.canvas.itemconfig(self.cpm_canvas, text=f"Score: {self.cpm}")
 
-
-#self.words_box.tag_add("highlight", f"1.{self.words_box_index}",f"1.{self.words_box_index + str(len(typed_word))}")
-# self.words_box.tag_configure("highlight", background=PINK)
