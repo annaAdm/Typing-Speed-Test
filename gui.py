@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import Label, Canvas, Button, Text
 from word_list import word_list as words
 import random
-#TODO: round the WPM e CPM by 2
+
 GREY = "#F0F0F0"
 PINK = "#FF52A2"
 L_BLUE = "#38F6FC"
@@ -34,13 +34,13 @@ class TypingSpeed_GUI:
 
     def create_widgets(self):
         self.title_label = Label(self.master, text="Typing Speed Test", font=("Courier New", 30, "bold"), fg=GREY, bg=PINK, padx=10, pady=10)
-        self.title_label.grid(row=0, column=0, columnspan=3, pady=5)
+        self.title_label.grid(row=0, column=0, columnspan=3, pady=10)
         self.canvas = Canvas(self.master, width=1500, height=200, bg=GREY, highlightthickness=0)
         self.time_canvas = self.canvas.create_text(250, 55, text="Time left: 60", fill=PINK, font=("Arial", 12, "bold"))
         self.error_canvas = self.canvas.create_text(50, 55, text=f"Errors: {self.errors}", fill=PINK, font=("Arial", 12, "bold"))
         self.wpm_canvas = self.canvas.create_text(500, 55, text=f"WPM: {""}", fill=PINK, font=("Arial", 12, "bold"))
         self.cpm_canvas = self.canvas.create_text(750, 55, text=f"Score: {""}", fill=PINK, font=("Arial", 12, "bold"))
-        self.highscore_label = Label(self.master, text=f"Best score: {self.high_score} ", font=("Arial", 12, "bold"), fg=PURPLE, bg=L_BLUE, padx=2, pady=2)
+        self.highscore_label = Label(self.master, text=f"Best score: {self.high_score} ", font=("Arial", 12, "bold"), fg=PURPLE, bg=L_BLUE, padx=5, pady=5)
         self.highscore_label.grid(row=0, column=1)
 
         self.end_game_canvas = Canvas(self.master, width=0, height=0, bg=L_BLUE, highlightthickness=0)
@@ -48,8 +48,8 @@ class TypingSpeed_GUI:
 
         self.canvas.grid(row=1, column=0, pady=5)
 
-        self.restart_button = Button(self.master, text="Restart", font=("Arial", 10, "bold"), fg=GREY, bg=PINK, pady=2, padx=2, command=self.restart, highlightthickness=0, bd=0)
-        self.restart_button.grid(row=1, column=1, pady=5)
+        self.restart_button = Button(self.master, text="Restart", font=("Arial", 12, "bold"), fg=GREY, bg=PINK, pady=5, padx=5, command=self.restart, highlightthickness=0, bd=0)
+        self.restart_button.grid(row=1, column=1)
 
         self.words_box = Text(self.master, width=70, height=8, font=("Arial", 15), fg=PURPLE, wrap="word")
         # Enable the Text widget so that we can insert content into it
@@ -113,16 +113,15 @@ class TypingSpeed_GUI:
             self.typing_entry.config(state="disabled")
             self.check_highscore()
             self.timesup()
-
-
     # ---------------------------- TIME'S UP ------------------------------- #
+
     def timesup(self):
         self.end_game_canvas.grid(row=1,column=0,columnspan=3,pady=5)
         Label(self.end_game_canvas, text="TIME's UP!", font=("Arial", 15, "bold"), fg=PURPLE, bg=L_BLUE, padx=2, pady=2).grid(row=2, column=0,columnspan=3, pady=5)
         Label(self.end_game_canvas, text=f"Your score: {self.cpm}\nYou can type {self.wpm} words per minute!\nYou did {self.errors} typing errors.",
               font=("Arial", 15, "bold"), fg=PURPLE, bg=L_BLUE, padx=10, pady=10).grid(row=3, column=0,columnspan=3, pady=5)
-
     # ---------------------------- CHECK HIGHSCORE ------------------------------- #
+
     def check_highscore(self):
         """ Checks if the current score is higher than the high score and updates the high score """
         if self.cpm > self.high_score:
@@ -153,7 +152,6 @@ class TypingSpeed_GUI:
     # ---------------------------- SPACE PRESS ------------------------------- #
     def space_press(self, event):
         if self.countdown_running:
-
             self.catch_word()
 
     def catch_word(self):
@@ -187,9 +185,8 @@ class TypingSpeed_GUI:
 
             else:
                 self.errors += 1
-                print("Typed word:", typed_words, "Right word was:", self.words[self.i])
+                print("Typed word:", self.typed_words_list[self.i], "Right word was:", self.words[self.i])
                 self.canvas.itemconfig(self.error_canvas, text=f"Errors: {self.errors}")
-                # print(self.words[self.i], self.typed_words_list[self.i], typed_words)
                 # underline the wrong word in words_box in pink
                 self.words_box.tag_add("wrong", start_index, end_index)
                 self.words_box.tag_config("wrong", underline=1, foreground=PINK)
@@ -201,8 +198,8 @@ class TypingSpeed_GUI:
 
         # Calculate CPM and WPM
         total_char = len(self.typing_entry.get("1.0", "end-1c").replace(" ", ""))
-        self.cpm = (total_char / 60) * 60
-        self.wpm = (self.cpm / 5) / 1
+        self.cpm = round(((total_char / 60) * 60), 2)
+        self.wpm = round(((self.cpm / 5) / 1), 2)
 
         # Update the display
         self.canvas.itemconfig(self.wpm_canvas, text=f"WPM: {self.wpm}")
